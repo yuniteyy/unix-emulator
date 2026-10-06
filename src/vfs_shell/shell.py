@@ -5,7 +5,8 @@ from dataclasses import dataclass
 from .commands import COMMANDS, CommandError
 
 DEFAULT_VFS_NAME = "default"
-DEFAULT_PROMPT = "$ "
+DEFAULT_PROMPT = "{vfs}:{cwd}$ "
+ROOT_PATH = "/"
 
 
 @dataclass
@@ -42,17 +43,23 @@ def format_error(name, error):
 
 
 class Shell:
-    """Interpreter state: VFS name, prompt and the running flag."""
+    """Interpreter state: VFS name, prompt, directory and run flag."""
 
     def __init__(self, vfs_name=DEFAULT_VFS_NAME, prompt=DEFAULT_PROMPT):
         """Create a shell with the given VFS name and prompt."""
         self.vfs_name = vfs_name
         self.prompt = prompt
+        self.cwd = []
         self.running = True
 
+    def cwd_text(self):
+        """Return the current directory as an absolute path."""
+        return ROOT_PATH + "/".join(self.cwd)
+
     def prompt_text(self):
-        """Return the prompt to display before the next input."""
-        return self.prompt
+        """Return the prompt; ``{vfs}`` and ``{cwd}`` are substituted."""
+        text = self.prompt.replace("{vfs}", self.vfs_name)
+        return text.replace("{cwd}", self.cwd_text())
 
     def execute(self, line):
         """Run one input line and return its :class:`Result`."""

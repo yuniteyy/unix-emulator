@@ -1,0 +1,7 @@
+# Ошибочные строки сообщаются и пропускаются
+ls first
+
+unknown_command arg
+echo "unclosed
+exit now
+cd after_errors

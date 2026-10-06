@@ -9,6 +9,8 @@ FONT = ("Courier New", 11)
 COLOR_BG = "#1e1e1e"
 COLOR_FG = "#d4d4d4"
 END = "end"
+PLAY_DELAY_MS = 300
+CLOSE_DELAY_MS = 1500
 
 
 class ShellWindow:
@@ -19,6 +21,8 @@ class ShellWindow:
         self.shell = shell
         self.root = root or tk.Tk()
         self.history = InputHistory()
+        self._steps = iter(())
+        self._delay = PLAY_DELAY_MS
         self._build_widgets()
 
     def _build_widgets(self):
@@ -54,15 +58,47 @@ class ShellWindow:
         self.output.configure(state="disabled")
         self.output.see(END)
 
+    def write_lines(self, lines):
+        """Append every item of ``lines`` to the output area."""
+        for text in lines:
+            self.write(text)
+
+    def _refresh_prompt(self):
+        """Show the current prompt next to the input field."""
+        self.prompt_label.configure(text=self.shell.prompt_text())
+
     def submit(self, line):
         """Echo ``line`` like a terminal, run it and show the result."""
         self.write(self.shell.prompt_text() + line)
-        result = self.shell.execute(line)
-        for text in result.lines():
-            self.write(text)
-        self.prompt_label.configure(text=self.shell.prompt_text())
+        self.write_lines(self.shell.execute(line).lines())
+        self._refresh_prompt()
         if not self.shell.running:
             self.root.destroy()
+
+    def play(self, steps, delay=PLAY_DELAY_MS):
+        """Replay script ``steps`` with a pause, imitating a dialog."""
+        self._steps = iter(steps)
+        self._delay = delay
+        self.entry.configure(state="disabled")
+        self.root.after(self._delay, self._play_next)
+
+    def _play_next(self):
+        """Show the next script step or finish the playback."""
+        step = next(self._steps, None)
+        if step is None:
+            self._finish_script()
+            return
+        self.write_lines(step.display_lines())
+        self._refresh_prompt()
+        self.root.after(self._delay, self._play_next)
+
+    def _finish_script(self):
+        """Give the input back to the user or close after ``exit``."""
+        if self.shell.running:
+            self.entry.configure(state="normal")
+            self.entry.focus_set()
+        else:
+            self.root.after(CLOSE_DELAY_MS, self.root.destroy)
 
     def _on_enter(self, _event):
         """Run the typed line and clear the input field."""
@@ -86,7 +122,13 @@ class ShellWindow:
         self._set_entry(self.history.following())
 
 
-def run_gui(shell):
-    """Open the window for ``shell`` and enter the Tk main loop."""
+def run_gui(shell, intro=(), steps=None):
+    """Open the window for ``shell`` and enter the Tk main loop.
+
+    ``intro`` lines are shown first; ``steps`` (if any) are replayed.
+    """
     window = ShellWindow(shell)
+    window.write_lines(intro)
+    if steps is not None:
+        window.play(steps)
     window.root.mainloop()

@@ -1,9 +1,14 @@
 """Smoke tests for the Tk window (skipped when no display is present)."""
+import time
 import tkinter as tk
 import unittest
 
 from vfs_shell.gui import ShellWindow
+from vfs_shell.script import play
 from vfs_shell.shell import Shell
+
+ATTEMPTS = 20
+PAUSE = 0.01
 
 
 class WindowTests(unittest.TestCase):
@@ -39,3 +44,22 @@ class WindowTests(unittest.TestCase):
         """Errors are displayed in the same area."""
         self.window.submit("nope")
         self.assertIn("nope: command not found", self.text())
+
+
+class PlaybackTests(unittest.TestCase):
+    """Script playback inside the window."""
+
+    def test_script_is_replayed(self):
+        """Steps appear in the output and the input is enabled again."""
+        try:
+            window = ShellWindow(Shell(vfs_name="demo", prompt="> "))
+        except tk.TclError:
+            self.skipTest("no display available")
+        window.play(play(window.shell, ["ls a", "bad"]), delay=1)
+        for _ in range(ATTEMPTS):
+            window.root.update()
+            time.sleep(PAUSE)
+        text = window.output.get("1.0", "end")
+        window.root.destroy()
+        self.assertIn("> ls a", text)
+        self.assertIn("bad: command not found", text)
