@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='utf-8'?>
+<vfs name="deep" owner="root" group="root">
+  <dir name="etc" owner="root" group="root">
+    <file name="motd" owner="root" group="root">Welcome to deep VFS
+</file>
+  </dir>
+  <dir name="home" owner="root" group="root">
+    <dir name="alice" owner="alice" group="users">
+      <dir name="docs" owner="alice" group="users">
+        <file name="report.txt" owner="alice" group="users">Q3 report
+</file>
+        <dir name="archive" owner="alice" group="users">
+          <dir name="2026" owner="alice" group="users">
+            <file name="summary.txt" owner="alice" group="users">Summary 2026
+</file>
+          </dir>
+        </dir>
+      </dir>
+    </dir>
+    <dir name="bob" owner="bob" group="users">
+      <file name="todo.txt" owner="bob" group="users">1. write tests
+2. commit
+</file>
+    </dir>
+  </dir>
+  <dir name="usr" owner="root" group="root">
+    <dir name="bin" owner="root" group="root">
+      <file name="tool.bin" owner="root" group="root" encoding="base64">AAECAwQFBgcICQ==</file>
+    </dir>
+  </dir>
+  <dir name="var" owner="root" group="root">
+    <dir name="log" owner="root" group="root">
+      <file name="syslog.txt" owner="root" group="root">boot ok
+</file>
+      <dir name="empty_dir" owner="root" group="root" />
+    </dir>
+  </dir>
+</vfs>

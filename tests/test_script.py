@@ -8,12 +8,13 @@ import unittest
 from vfs_shell.app import main, run_headless
 from vfs_shell.script import ScriptError, load_script, play
 from vfs_shell.shell import Shell
+from vfs_shell.vfs import Vfs
 
 
 def run_lines(lines, **kwargs):
     """Run ``lines`` headless and return the printed output lines."""
     printed = []
-    run_headless(Shell(**kwargs), lines, emit=printed.append)
+    run_headless(Shell(Vfs.empty(), **kwargs), lines, emit=printed.append)
     return printed
 
 
@@ -22,7 +23,7 @@ class PlayTests(unittest.TestCase):
 
     def test_input_and_output_are_shown(self):
         """Both the typed line and its output are displayed."""
-        out = run_lines(["ls -l"], vfs_name="v", prompt="> ")
+        out = run_lines(["ls -l"], prompt="> ")
         self.assertEqual(out, ["> ls -l", "name: ls, args: ['-l']"])
 
     def test_errors_are_skipped(self):

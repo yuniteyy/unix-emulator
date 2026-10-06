@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<vfs name="bad64">
+  <file name="a.bin" encoding="base64">@@@not-base64@@@</file>
+</vfs>

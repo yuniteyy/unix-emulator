@@ -1,11 +1,11 @@
 """Application bootstrap: configuration, script loading, start-up."""
 import sys
-from pathlib import Path
 
 from .config import debug_lines, parse_args
 from .gui import run_gui
 from .script import ScriptError, load_script, play
-from .shell import DEFAULT_VFS_NAME, Shell
+from .shell import Shell
+from .vfs import Vfs, VfsError
 
 EXIT_OK = 0
 EXIT_ERROR = 1
@@ -19,11 +19,11 @@ def run_headless(shell, lines, emit=print):
     return EXIT_OK
 
 
-def vfs_name(config):
-    """Return the VFS name shown in the window title."""
+def load_vfs(config):
+    """Load the VFS named by ``--vfs`` or create an empty one."""
     if config.vfs:
-        return Path(config.vfs).stem
-    return DEFAULT_VFS_NAME
+        return Vfs.load(config.vfs)
+    return Vfs.empty()
 
 
 def read_lines(config):
@@ -41,11 +41,12 @@ def main(argv=None):
     debug = debug_lines(config)
     print("\n".join(debug))
     try:
+        vfs = load_vfs(config)
         lines = read_lines(config)
-    except ScriptError as exc:
+    except (VfsError, ScriptError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return EXIT_ERROR
-    shell = Shell(vfs_name=vfs_name(config), prompt=config.prompt)
+    shell = Shell(vfs, prompt=config.prompt)
     if config.headless:
         return run_headless(shell, lines)
     steps = play(shell, lines) if config.script else None

@@ -3,6 +3,7 @@
 Every command is a function ``(shell, args) -> str`` returning its output.
 Failures are reported by raising :class:`CommandError`.
 """
+from .vfs import VfsError
 
 
 class CommandError(Exception):
@@ -37,8 +38,22 @@ def cmd_exit(shell, args):
     return ""
 
 
+def cmd_vfs_save(shell, args):
+    """Save the current VFS state to a disk file in the XML format."""
+    if not args:
+        raise CommandError("missing file operand")
+    if args[1:]:
+        raise CommandError("too many arguments")
+    try:
+        shell.vfs.save(args[0])
+    except VfsError as exc:
+        raise CommandError(str(exc)) from None
+    return f"VFS saved to {args[0]}"
+
+
 COMMANDS = {
     "ls": cmd_ls,
     "cd": cmd_cd,
     "exit": cmd_exit,
+    "vfs-save": cmd_vfs_save,
 }

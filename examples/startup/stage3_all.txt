@@ -1,0 +1,13 @@
+# Этап 3: команды заглушки, vfs-save и обработка ошибок
+ls
+ls -l /home
+cd /home/alice
+# vfs-save: сохранение состояния VFS на диск
+vfs-save out/saved_by_script.xml
+# ошибки vfs-save
+vfs-save
+vfs-save one.xml two.xml
+vfs-save /no/such/dir/file.xml
+# прочие ошибки
+unknown_command
+cd

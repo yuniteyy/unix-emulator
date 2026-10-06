@@ -3,8 +3,8 @@ import shlex
 from dataclasses import dataclass
 
 from .commands import COMMANDS, CommandError
+from .vfs import Vfs
 
-DEFAULT_VFS_NAME = "default"
 DEFAULT_PROMPT = "{vfs}:{cwd}$ "
 ROOT_PATH = "/"
 
@@ -45,12 +45,17 @@ def format_error(name, error):
 class Shell:
     """Interpreter state: VFS name, prompt, directory and run flag."""
 
-    def __init__(self, vfs_name=DEFAULT_VFS_NAME, prompt=DEFAULT_PROMPT):
-        """Create a shell with the given VFS name and prompt."""
-        self.vfs_name = vfs_name
+    def __init__(self, vfs=None, prompt=DEFAULT_PROMPT):
+        """Create a shell working on ``vfs`` (empty by default)."""
+        self.vfs = vfs if vfs is not None else Vfs.empty()
         self.prompt = prompt
         self.cwd = []
         self.running = True
+
+    @property
+    def vfs_name(self):
+        """Return the name of the mounted VFS."""
+        return self.vfs.name
 
     def cwd_text(self):
         """Return the current directory as an absolute path."""

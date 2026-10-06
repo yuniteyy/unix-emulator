@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<vfs name="dup">
+  <file name="a.txt">1</file>
+  <dir name="a.txt" />
+</vfs>

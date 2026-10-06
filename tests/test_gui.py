@@ -6,6 +6,7 @@ import unittest
 from vfs_shell.gui import ShellWindow
 from vfs_shell.script import play
 from vfs_shell.shell import Shell
+from vfs_shell.vfs import Vfs
 
 ATTEMPTS = 20
 PAUSE = 0.01
@@ -17,7 +18,7 @@ class WindowTests(unittest.TestCase):
     def setUp(self):
         """Open a window or skip the test if Tk cannot start."""
         try:
-            self.window = ShellWindow(Shell(vfs_name="demo"))
+            self.window = ShellWindow(Shell(Vfs.empty("demo")))
         except tk.TclError:
             self.skipTest("no display available")
 
@@ -52,7 +53,7 @@ class PlaybackTests(unittest.TestCase):
     def test_script_is_replayed(self):
         """Steps appear in the output and the input is enabled again."""
         try:
-            window = ShellWindow(Shell(vfs_name="demo", prompt="> "))
+            window = ShellWindow(Shell(Vfs.empty("demo"), prompt="> "))
         except tk.TclError:
             self.skipTest("no display available")
         window.play(play(window.shell, ["ls a", "bad"]), delay=1)
