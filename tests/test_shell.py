@@ -50,7 +50,7 @@ class ExecuteTests(unittest.TestCase):
 
     def test_commands_are_registered(self):
         """Every supported command is known to the dispatcher."""
-        for name in ("ls", "cd", "echo", "cat", "exit", "vfs-save"):
+        for name in ("ls", "cd", "echo", "cat", "chown", "exit", "vfs-save"):
             self.assertIn(name, COMMANDS)
 
     def test_exit(self):

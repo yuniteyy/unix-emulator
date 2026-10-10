@@ -1,0 +1,39 @@
+# Этап 5: chown (все режимы) и обработка ошибок; изменения только в памяти
+# --- владелец
+ls -l /home/bob
+chown carol /home/bob/todo.txt
+ls -l /home/bob
+# --- владелец и группа
+chown dave:staff /home/bob/todo.txt
+ls -l /home/bob
+# --- только группа
+chown :wheel /home/bob/todo.txt
+ls -l /home/bob
+# --- OWNER: задаёт группу, равную владельцу
+chown erin: /home/bob/todo.txt
+ls -l /home/bob
+# --- несколько файлов сразу
+chown root /etc/motd /var/log/syslog.txt
+ls -l /etc /var/log
+# --- каталог без -R и с -R
+chown frank /home/alice
+ls -l /home /home/alice
+chown -R frank:team /home/alice
+ls -l /home/alice /home/alice/docs /home/alice/docs/archive/2026
+# --- относительный путь и числовые идентификаторы
+cd /home/bob
+chown gina todo.txt
+chown 1000:100 todo.txt
+ls -l
+cd
+# --- ошибки
+chown
+chown alice
+chown alice /nope
+chown "bad name" /etc/motd
+chown a:b:c /etc/motd
+chown -z alice /etc/motd
+chown zed /etc/motd /nope
+ls -l /etc
+# --- сохранение результата на диск
+vfs-save out/chown_result.xml

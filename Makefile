@@ -11,3 +11,6 @@ test:
 
 lint:
 	$(PYTHON) -m flake8 src tests
+
+demo:
+	sh scripts/run_all.sh

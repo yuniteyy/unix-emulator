@@ -20,6 +20,9 @@ OPTION_PREFIX = "-"
 END_OF_OPTIONS = "--"
 CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b-\x1f\x7f]")
 REPLACEMENT = "\ufffd"
+CHOWN_FLAGS = "R"
+OWNER_SEPARATOR = ":"
+ACCOUNT_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_.-]*|[0-9]+")
 
 
 class CommandError(Exception):
@@ -179,6 +182,55 @@ def cmd_cat(shell, args):
     return output
 
 
+def parse_owner_spec(spec):
+    """Parse ``OWNER[:GROUP]`` into ``(owner, group)``.
+
+    A missing part is ``None`` (unchanged). ``OWNER:`` also sets the
+    group to ``OWNER``, as the login group does in UNIX.
+    """
+    owner, colon, group = spec.partition(OWNER_SEPARATOR)
+    if not (owner or group):
+        raise CommandError(f"invalid user: '{spec}'")
+    for label, name in (("user", owner), ("group", group)):
+        if name and not ACCOUNT_NAME.fullmatch(name):
+            raise CommandError(f"invalid {label}: '{spec}'")
+    if colon and owner and not group:
+        group = owner
+    return owner or None, group or None
+
+
+def _chown_node(node, owner, group, recursive):
+    """Change the owner and/or group of ``node`` (and its subtree)."""
+    if owner:
+        node.owner = owner
+    if group:
+        node.group = group
+    if recursive:
+        for child in node.children.values():
+            _chown_node(child, owner, group, recursive)
+
+
+def cmd_chown(shell, args):
+    """Change ownership in memory: ``chown [-R] OWNER[:GROUP] PATH...``."""
+    flags, operands = parse_options(args, CHOWN_FLAGS)
+    if not operands:
+        raise CommandError("missing operand")
+    if not operands[1:]:
+        raise CommandError(f"missing operand after '{operands[0]}'")
+    owner, group = parse_owner_spec(operands[0])
+    errors = []
+    for path in operands[1:]:
+        try:
+            node, _ = shell.vfs.lookup(path, shell.cwd)
+        except VfsError as exc:
+            errors.append(f"cannot access '{path}': {exc}")
+            continue
+        _chown_node(node, owner, group, "R" in flags)
+    if errors:
+        raise CommandError("\n".join(errors))
+    return ""
+
+
 def cmd_exit(shell, args):
     """Stop the interpreter. Accepts no arguments."""
     if args:
@@ -205,6 +257,7 @@ COMMANDS = {
     "cd": cmd_cd,
     "echo": cmd_echo,
     "cat": cmd_cat,
+    "chown": cmd_chown,
     "exit": cmd_exit,
     "vfs-save": cmd_vfs_save,
 }
