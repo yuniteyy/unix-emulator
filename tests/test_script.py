@@ -23,19 +23,19 @@ class PlayTests(unittest.TestCase):
 
     def test_input_and_output_are_shown(self):
         """Both the typed line and its output are displayed."""
-        out = run_lines(["ls -l"], prompt="> ")
-        self.assertEqual(out, ["> ls -l", "name: ls, args: ['-l']"])
+        out = run_lines(["echo hi"], prompt="> ")
+        self.assertEqual(out, ["> echo hi", "hi"])
 
     def test_errors_are_skipped(self):
         """An erroneous line is reported and the script goes on."""
-        out = run_lines(["bad", "ls"])
+        out = run_lines(["bad", "echo ok"])
         self.assertIn("bad: command not found", out)
         self.assertTrue(any("строка 1" in text for text in out))
-        self.assertTrue(any("name: ls" in text for text in out))
+        self.assertIn("ok", out)
 
     def test_blank_lines_and_comments(self):
         """Blank lines vanish, comments are only echoed."""
-        out = run_lines(["", "# note", "ls"], prompt="> ")
+        out = run_lines(["", "# note", "echo x"], prompt="> ")
         self.assertEqual(out[0], "> # note")
         self.assertEqual(len(out), 3)
 

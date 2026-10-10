@@ -1,0 +1,8 @@
+# Содержимое файлов deep.xml: используется для проверки vfs-save
+cat /etc/motd
+cat /home/alice/docs/report.txt
+cat /home/alice/docs/archive/2026/summary.txt
+cat /home/bob/todo.txt
+cat /var/log/syslog.txt
+ls -l /usr/bin
+ls -l /home/alice/docs

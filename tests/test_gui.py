@@ -37,9 +37,9 @@ class WindowTests(unittest.TestCase):
 
     def test_submit_shows_dialog(self):
         """Both the typed line and the result are displayed."""
-        self.window.submit("ls -l")
-        self.assertIn("$ ls -l", self.text())
-        self.assertIn("name: ls, args: ['-l']", self.text())
+        self.window.submit("echo hi there")
+        self.assertIn("demo:/$ echo hi there", self.text())
+        self.assertIn("\nhi there\n", self.text())
 
     def test_error_is_displayed(self):
         """Errors are displayed in the same area."""
@@ -56,11 +56,11 @@ class PlaybackTests(unittest.TestCase):
             window = ShellWindow(Shell(Vfs.empty("demo"), prompt="> "))
         except tk.TclError:
             self.skipTest("no display available")
-        window.play(play(window.shell, ["ls a", "bad"]), delay=1)
+        window.play(play(window.shell, ["echo a", "bad"]), delay=1)
         for _ in range(ATTEMPTS):
             window.root.update()
             time.sleep(PAUSE)
         text = window.output.get("1.0", "end")
         window.root.destroy()
-        self.assertIn("> ls a", text)
+        self.assertIn("> echo a", text)
         self.assertIn("bad: command not found", text)

@@ -1,0 +1,38 @@
+# Этап 4: ls, cd, echo, cat (все режимы) и обработка ошибок
+# --- echo
+echo Привет,   мир
+echo "несколько   пробелов сохраняются"
+echo
+# --- ls: текущий каталог, пути, -l, -a, несколько операндов
+ls
+ls -l
+ls -a
+ls /home /etc
+ls -l /home/alice/docs
+ls /etc/motd
+# --- cd: абсолютный и относительный путь, .., без аргументов
+cd /home/alice
+ls
+cd docs/archive/2026
+ls -l
+cd ../../..
+cd ../bob
+ls
+# --- cat: один файл, несколько, относительный путь
+cat todo.txt
+cat /etc/motd /var/log/syslog.txt
+cd
+cat home/alice/docs/report.txt
+# --- ошибки
+ls /nope
+ls -z
+ls --all
+cd /nope
+cd /etc/motd
+cd a b
+cat
+cat /nope
+cat /etc
+cat /etc/motd /nope
+echo "незакрытая кавычка
+неизвестная_команда

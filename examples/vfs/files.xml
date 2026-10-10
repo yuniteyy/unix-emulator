@@ -1,5 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <vfs name="files" owner="root" group="root">
+  <file name=".secret" owner="root" group="root">hidden
+</file>
   <file name="hello.txt" owner="root" group="root">Hello, VFS!
 </file>
   <file name="notes.txt" owner="alice" group="users">Line one

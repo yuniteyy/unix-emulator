@@ -1,6 +1,7 @@
 """Tests for parsing, dispatch and error reporting of the shell core."""
 import unittest
 
+from vfs_shell.commands import COMMANDS
 from vfs_shell.history import InputHistory
 from vfs_shell.shell import Shell, parse_line
 
@@ -47,12 +48,10 @@ class ExecuteTests(unittest.TestCase):
         self.assertTrue(result.is_error)
         self.assertIn("parse error", result.output)
 
-    def test_stub_prints_name_and_args(self):
-        """Stubs print their own name and the received arguments."""
-        result = self.shell.execute("ls -l a b")
-        self.assertEqual(result.output, "name: ls, args: ['-l', 'a', 'b']")
-        result = self.shell.execute("cd /usr")
-        self.assertEqual(result.output, "name: cd, args: ['/usr']")
+    def test_commands_are_registered(self):
+        """Every supported command is known to the dispatcher."""
+        for name in ("ls", "cd", "echo", "cat", "exit", "vfs-save"):
+            self.assertIn(name, COMMANDS)
 
     def test_exit(self):
         """``exit`` stops the shell."""
