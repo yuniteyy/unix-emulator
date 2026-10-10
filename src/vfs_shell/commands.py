@@ -182,6 +182,12 @@ def cmd_cat(shell, args):
     return output
 
 
+def _check_account(label, name, spec):
+    """Reject a non-empty account ``name`` with forbidden characters."""
+    if name and not ACCOUNT_NAME.fullmatch(name):
+        raise CommandError(f"invalid {label}: '{spec}'")
+
+
 def parse_owner_spec(spec):
     """Parse ``OWNER[:GROUP]`` into ``(owner, group)``.
 
@@ -191,9 +197,8 @@ def parse_owner_spec(spec):
     owner, colon, group = spec.partition(OWNER_SEPARATOR)
     if not (owner or group):
         raise CommandError(f"invalid user: '{spec}'")
-    for label, name in (("user", owner), ("group", group)):
-        if name and not ACCOUNT_NAME.fullmatch(name):
-            raise CommandError(f"invalid {label}: '{spec}'")
+    _check_account("user", owner, spec)
+    _check_account("group", group, spec)
     if colon and owner and not group:
         group = owner
     return owner or None, group or None
